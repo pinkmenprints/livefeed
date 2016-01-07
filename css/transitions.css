@@ -1,0 +1,17 @@
+.media {
+        -webkit-transition-property: -webkit-transform, opacity;
+        -webkit-transition-duration: 1s;
+        -webkit-transition-timing-function: ease-in-out;
+        -webkit-backface-visibility: hidden;
+        text-align: center;
+}
+
+.media.outgoing {
+        -webkit-transform: rotateY(0deg);
+        opacity: 1;
+}
+
+.media.incoming {
+        -webkit-transform: rotateY(180deg);
+        opacity: 0.2;
+}

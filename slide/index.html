@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+        <head>
+                <title>Slidetagram. Create a live slideshow with instagram photos</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+                <link href="../css/jumbotron-narrow.css" rel="stylesheet">
+		<link href="../css/transitions.css" rel="stylesheet">
+		<link rel="shortcut icon" href="../favicon.ico" >
+		<link rel="icon" type="image/gif" href="../animated_favicon1.gif" >
+                <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!--[if lt IE 9]>
+                        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+                        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+                <![endif]-->
+		<script src="../js/cookie.min.js"></script>
+		<script language="javascript">
+			var token = cookie.get('token');
+			if (token == undefined) authByHash();
+			window.location.hash = "";
+			function authByHash() {	
+				var hash = window.location.hash && window.location.hash[0] == "#" ? window.location.hash.substr(1) : window.location.hash;
+    	        var split = hash.split("=");
+				var index = split.indexOf("access_token");
+				if (index == -1) window.location = "http://slidetagram.com";
+				token = split[index+1];
+				cookie.set('token', token, {domain:'pinkmenprints.github.io/instalive', path:'/'});
+			}
+		</script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-45490731-1', 'slidetagram.com');
+          ga('send', 'pageview');
+
+        </script>
+        </head>
+        <body>
+                <div class="container" style="width: 970px !important">
+                        <div class="header">
+                                <ul class="nav nav-pills pull-right">
+                                        <li class="active"><a href="../">Home</a></li>
+                                        <li><a href="../about/">About</a></li>
+                                </ul>
+                                <h3 class="text-muted">Slidetagram</h3>
+                        </div>
+
+                        <div class="jumbotron">
+				<form id="main-form">
+	                                <h1>Welcome!</h1>
+        	                        <p class="lead">Now you can create your custom live slide show!</p>
+                	                <p class="lead">Choose your <input type="text" placeholder="#hashtag" id="search_tag" data-bind="value: hashtag" /> and <button id="go" class="btn btn-success">go!</button></p>
+				
+				</form>
+				<p class="lead pull-right"><button id="advanced-button" type="button" class="btn btn-xs"><i class="icon-cog"></i>advanced options</button></p>
+				<br />
+                        </div>
+
+			<div id="advanced-options" class="well" style="display:none">
+				<form class="form-horizontal">
+					<fieldset>
+                                        <div class="checkbox">
+                                                <label>
+                                                        <input type="checkbox" data-bind="checked: showUserAndCaptions"> Show author and caption of the photo
+                                                <label>
+                                        </div>
+					<!--<div class="checkbox">
+						<label>
+							<input type="checkbox" data-bind="checked: showOtherUserComments"> Show other users comments
+						</label>
+					</div>-->
+					<div class="form-group">
+						<label for="textArea" class="col-lg-2 control-label">Interval in seconds between photos</label>
+						<div class="col-lg-10">
+							<input type="text" data-bind="value: interval" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="textArea" class="col-lg-2 control-label">Instruction text</label>
+						<div class="col-lg-10">
+							<textarea class="form-control" rows="3" id="textArea" data-bind="value: instruction"></textarea>
+							<div class="help-block">Don't remove the <strong>{{#hashtag}}</strong> from the text</div>
+						</div>
+					</div>
+					</fieldset>
+				</form>
+                                </div>
+		
+			<div class="slideshow" style="display:none">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-body" id="instruction" data-bind="html: fullInstruction"></div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-122">
+						<div class="media incoming">
+							<img class="photo" style="display:none" />
+						</div>
+						<div class="media outgoing">
+							<img class="photo" style="display:none" />
+						</div>
+					</div>
+					<div id="comments" class="col-xs-2" data-bind="visible: showOtherUserComments, foreach: comments">
+						<blockquote class="pull-right">
+							<p data-bind="text: text"></p>
+							<small data-bind="text: from.username"></small>
+						</blockquote>
+					</div>
+				</div>
+				<div class="row" data-bind="visible: showUserAndCaptions">
+					<div class="col-md-12" data-bind="if: caption">
+						<blockquote id="owner" data-bind="with: caption">
+							<p data-bind="text: text"></p>
+							<span class="text-success" data-bind="text: from.username"></span>
+						</blockquote>
+					</div>
+				</div>
+
+			</div>
+                        <div class="footer">
+                                <p>Made with <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> in Rio de Janeiro &copy; Slidetagram <script>document.write(new Date().getFullYear())</script></p>
+                        </div>
+
+                </div> <!-- /container -->
+                <script src="http://code.jquery.com/jquery.js"></script>
+                <script src="../js/bootstrap.min.js"></script>
+		<script src="../js/jquery.fullscreen-min.js"></script>
+		<script src="../js/knockout-3.0.0.js"></script>
+		<script language="javascript">
+			var items = [];
+			var interval = 0;
+			var min = 0;
+
+			function showSlideShow() {
+				$(".header, .jumbotron, #advanced-options").hide();
+				$(".slideshow").show();
+			}
+			
+			function doAjax(url, cb) {
+				$.ajax({
+				    url: url,
+				    type: 'POST',
+				    crossDomain: true,
+				    dataType: 'jsonp',
+				    success: cb
+				});
+			}
+
+			function showLessViewed() {
+				if (!items.length) return;
+				clearInterval(interval);
+				items.sort(function (a,b) { return a.viewed <= b.viewed ? -1 : 1 });
+				var first = items[0];
+				first.show(first);
+				min = first.viewed++;
+				setTimeout(showLessViewed, first.duration);
+			}
+
+			function showPhoto(data) {
+				$(".incoming .photo").attr("src", data.src).show();
+				switchMediaDivs();
+				vm.caption(data.caption);
+				vm.comments(data.comments);
+			}
+			
+			function switchMediaDivs() {
+				$(".incoming").removeClass("incoming").addClass("temp");
+				$(".outgoing").removeClass("outgoing").addClass("incoming");
+				$(".temp").removeClass("temp").addClass("outgoing");
+				$(".incoming .photo").hide();
+			}
+
+			function loadPhoto() {
+				var url = "https://api.instagram.com/v1/tags/" + $("#search_tag").val().replace("#","").replace(" ", "") + "/media/recent?access_token=" + token;
+				console.log(url);
+				doAjax(url, function(json) {
+					var f = json.data || [];
+					for (var i=0; i < f.length; i++) {
+						var src = f[i].images.standard_resolution.url;
+						if (!items.filter(function(e) { return e.type == "photo" && e.src == src }).length)
+						        items.push({"src":src, type:"photo", viewed:min, show:showPhoto, duration:vm.interval() * 1000, caption: f[i].caption, comments: f[i].comments.data});
+
+					}
+					setTimeout(loadPhoto, 30000);
+				});
+			}
+
+			function go() {
+				loadPhoto();
+				interval = setInterval(showLessViewed, 5000);
+				showSlideShow();
+				$(document).fullScreen(true);
+		
+			}
+			$("#main-form").submit(function() { go(); return false;});
+			$("#search_tag")
+				.focus(function() { var self = $(this); if (self.val() == "") self.val("#");  })
+				.blur(function() { var self = $(this); if (self.val() == "#") self.val("");});
+
+			$("#advanced-button").click(function() {
+				$("#advanced-options").toggle("slow");
+			});
+
+			var slideshowViewModel = function() {
+				self = this;
+				self.showUserAndCaptions = ko.observable(true);
+				self.showOtherUserComments = ko.observable(false);
+				self.instruction = ko.observable("Add the hashtag {{#hashtag}} into your Instagram photos");
+				self.interval = ko.observable(7);
+				self.hashtag = ko.observable("");
+				self.fullInstruction = ko.computed(function() { return self.instruction().replace("{{#hashtag}}", "<span class='text-success'>" + self.hashtag() + "</span>");}, self);
+				self.comments = ko.observableArray([{ text: "", from:{username:""}  }]);
+				self.caption = ko.observable({text:"", from:{username:"", profile_picture:""}});
+			};
+			var vm = new slideshowViewModel();
+			ko.applyBindings(vm);
+		</script>
+        </body>
+</html>

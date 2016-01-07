@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+        <head>
+                <title>Slidetagram. Create a live slideshow with instagram photos</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+                <link href="../css/jumbotron-narrow.css" rel="stylesheet">
+		<link href="../css/transitions.css" rel="styleshett">
+		<link rel="shortcut icon" href="../favicon.ico" >
+		<link rel="icon" type="image/gif" href="../animated_favicon1.gif" >
+                <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!--[if lt IE 9]>
+                        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+                        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+                <![endif]-->
+		<script language="javascript">
+			var hash = window.location.hash && window.location.hash[0] == "#" ? window.location.hash.substr(1) : window.location.hash;
+                        var split = hash.split("=");
+			var index = split.indexOf("access_token");
+			if (index == -1) window.location = "http://slidetagram.com";
+			var token = split[index+1];
+			window.location.hash = "";
+		</script>
+        </head>
+        <body>
+                <div class="container">
+                        <div class="header">
+                                <ul class="nav nav-pills pull-right">
+                                        <li class="active"><a href="../">Home</a></li>
+                                        <li><a href="../about">About</a></li>
+                                        <li><a href="../contact">Contact</a></li>
+                                </ul>
+                                <h3 class="text-muted">Slidetagram</h3>
+                        </div>
+
+                        <div class="jumbotron">
+                                <h1>Welcome!</h1>
+                                <p class="lead">Now you can create your custom live slide show!</p>
+                                <p class="lead">Choose your <input type="text" placeholder="#hashtag" id="search_tag" /> and <button id="go" class="btn btn-success">go!</button></p>
+                        </div>
+
+			
+			<div class="slideshow" style="display:none">
+				<div class="row">
+					<div class="span12">
+						<div class="panel panel-default">
+							<div class="panel-body" id="instruction">Add the hashtag <span id="searched_hashtag" class="text-success">#hashtag</span> into your Instagram photos</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="span12">
+						<div class="media incoming">
+							<img class="photo" style="display:none" />
+						</div>
+						<div class="media outgoing">
+							<img class="photo" style="display:none" />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="span12">
+						<blockquote id="owner">
+							<p></p>
+							<small></small>
+						</blockquote>
+					</div>
+				</div>
+
+			</div>
+                        <div class="footer">
+                                <p>&copy; Slidetagram 2013</p>
+                        </div>
+
+                </div> <!-- /container -->
+                <script src="http://code.jquery.com/jquery.js"></script>
+                <script src="../js/bootstrap.min.js"></script>
+		<script src="../js/jquery.fullscreen-min.js"></script>
+		<script language="javascript">
+			var items = [];
+			var interval = 0;
+			var min;
+
+			function showSlideShow() {
+				$(".header, .jumbotron").hide();
+				$(".slideshow").show();
+			}
+			
+			function doAjax(url, cb) {
+				$.ajax({
+				    url: url,
+				    type: 'POST',
+				    crossDomain: true,
+				    dataType: 'jsonp',
+				    success: cb
+				});
+			}
+
+			function showLessViewed() {
+				if (!items.length) return;
+				clearInterval(interval);
+				items.sort(function (a,b) { return a.viewed <= b.viewed ? -1 : 1 });
+				var first = items[0];
+				first.show(first);
+				min = first.viewed++;
+				setTimeout(showLessViewed, first.duration);
+			}
+
+			function showPhoto(data) {
+				$(".incoming .photo").attr("src", data.src).show();
+				switchMediaDivs();
+				$("#owner p").text((data.caption || {}).text);
+				$("#owner small").text((data.caption || {from:{}}).from.username);
+			}
+			
+			function switchMediaDivs() {0
+				$(".incoming").removeClass("incoming").addClass("temp");
+				$(".outgoing").removeClass("outgoing").addClass("incoming");
+				$(".temp").removeClass("temp").addClass("outgoing");
+				$(".incoming .photo").hide();
+			}
+
+			function loadPhoto() {
+				var url = "https://api.instagram.com/v1/tags/" + $("#search_tag").val().replace("#","") + "/media/recent?access_token=" + token;
+				console.log(url);
+				doAjax(url, function(json) {
+					var f = json.data || [];
+					for (var i=0; i < f.length; i++) {
+						var src = f[i].images.standard_resolution.url;
+						if (!items.filter(function(e) { return e.type == "photo" && e.src == src }).length)
+						        items.push({"src":src, type:"photo", viewed:min, show:showPhoto, duration:5000, caption: f[i].caption, comments: f[i].comments.data});
+
+					}
+					setTimeout(loadPhoto, 30000);
+				});
+			}
+
+			function go() {
+				loadPhoto();
+				interval = setInterval(showLessViewed, 5000);
+				showSlideShow();
+				$(document).fullScreen(true);
+		
+			}
+
+			$("#go").click(go);
+			$("#search_tag")
+				.focus(function() { var self = $(this); if (self.val() == "") self.val("#");  })
+				.blur(function() { var self = $(this); if (self.val() == "#") self.val("");})
+				.change(function() { var self = $(this); $("#searched_hashtag").text(self.val()); });
+		</script>
+        </body>
+</html>
