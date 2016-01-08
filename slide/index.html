@@ -22,7 +22,7 @@
 				var hash = window.location.hash && window.location.hash[0] == "#" ? window.location.hash.substr(1) : window.location.hash;
     	        var split = hash.split("=");
 				var index = split.indexOf("access_token");
-				if (index == -1) window.location = "http://slidetagram.com";
+				if (index == -1) window.location = "pinkmenprints.github.io/livefeed";
 				token = split[index+1];
 				cookie.set('token', token, {domain:'pinkmenprints.github.io/livefeed', path:'/'});
 			}
